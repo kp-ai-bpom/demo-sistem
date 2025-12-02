@@ -1,0 +1,52 @@
+{
+  "jabatan": "Administrator",
+  "source_file": "skj_administrator.docx",
+  "kompetensi": [
+    {
+      "nama_kompetensi": "Integritas",
+      "definisi": "Kemampuan bertindak konsisten sesuai nilai, norma, dan etika organisasi dalam setiap situasi.",
+      "indikator_perilaku": [
+        "Menolak tindakan yang bertentangan dengan aturan.",
+        "Bersikap jujur dalam penyampaian informasi.",
+        "Menghindari konflik kepentingan."
+      ],
+      "contoh_perilaku": [
+        "Mengakui kesalahan ketika melakukan kekeliruan.",
+        "Menolak permintaan mengubah data secara tidak sah.",
+        "Mengikuti prosedur meskipun ada tekanan."
+      ],
+      "level_mapping": {
+        "1": "Menunjukkan kejujuran dasar dan mematuhi aturan sederhana.",
+        "2": "Menghindari tindakan yang berisiko melanggar norma dan melaporkan pelanggaran ringan.",
+        "3": "Konsisten menjaga integritas meski ada tekanan.",
+        "4": "Menjadi teladan integritas dalam tim dan mendorong budaya jujur.",
+        "5": "Mengembangkan mekanisme penguatan integritas tingkat unit organisasi."
+      }
+    },
+    {
+      "nama_kompetensi": "Kerjasama",
+      "definisi": "Kemampuan bekerja sama dengan orang lain untuk mencapai tujuan organisasi.",
+      "indikator_perilaku": [
+        "Bersedia membantu rekan kerja.",
+        "Berkomunikasi terbuka dalam tim.",
+        "Membangun suasana kerja yang saling menghargai."
+      ],
+      "contoh_perilaku": [
+        "Membantu rekan menyelesaikan tugas tanpa diminta.",
+        "Memberikan masukan dengan cara yang sopan.",
+        "Mencari solusi bersama saat terjadi konflik."
+      ],
+      "level_mapping": {
+        "1": "Bersedia bekerja sama pada tugas yang sederhana.",
+        "2": "Aktif mendukung anggota tim.",
+        "3": "Mengelola dinamika kerja tim secara efektif.",
+        "4": "Mengoptimalkan kolaborasi antar-unit.",
+        "5": "Menciptakan lingkungan kerja kolaboratif lintas organisasi."
+      }
+    }
+  ],
+  "metadata": {
+    "extracted_at": "2025-01-01T00:00:00Z",
+    "extractor_version": "v1"
+  }
+}

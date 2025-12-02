@@ -1,0 +1,52 @@
+{
+  "jabatan": "Kepala Seksi",
+  "source_file": "skj_kepala_seksi.docx",
+  "kompetensi": [
+    {
+      "nama_kompetensi": "Pengambilan Keputusan",
+      "definisi": "Kemampuan membuat keputusan yang tepat berbasis data, risiko, dan tujuan unit.",
+      "indikator_perilaku": [
+        "Mengidentifikasi informasi penting untuk keputusan.",
+        "Menghitung risiko dari setiap alternatif keputusan.",
+        "Mengambil keputusan yang dapat dipertanggungjawabkan."
+      ],
+      "contoh_perilaku": [
+        "Menentukan prioritas tugas unit berdasarkan urgensi.",
+        "Mengambil keputusan cepat saat terjadi situasi kritis.",
+        "Menolak keputusan yang tidak sesuai regulasi."
+      ],
+      "level_mapping": {
+        "1": "Mengambil keputusan pada situasi rutin.",
+        "2": "Menggunakan data dasar dalam pengambilan keputusan.",
+        "3": "Mengambil keputusan strategis berbasis analisis.",
+        "4": "Mengelola proses pengambilan keputusan tim.",
+        "5": "Membangun kebijakan dan keputusan tingkat organisasi."
+      }
+    },
+    {
+      "nama_kompetensi": "Kepemimpinan",
+      "definisi": "Kemampuan memimpin, mengarahkan, dan memotivasi tim untuk mencapai tujuan.",
+      "indikator_perilaku": [
+        "Memberikan arahan kerja yang jelas.",
+        "Memotivasi anggota tim.",
+        "Menjadi role model dalam sikap kerja."
+      ],
+      "contoh_perilaku": [
+        "Memberikan feedback tepat waktu kepada staf.",
+        "Menetapkan tujuan tim secara realistis.",
+        "Mendorong budaya kerja yang positif."
+      ],
+      "level_mapping": {
+        "1": "Memimpin tugas sederhana.",
+        "2": "Mengarahkan pekerjaan tim kecil.",
+        "3": "Memimpin tim secara efektif dalam berbagai situasi.",
+        "4": "Mengelola dinamika tim tingkat unit.",
+        "5": "Menjadi pemimpin strategis organisasi."
+      }
+    }
+  ],
+  "metadata": {
+    "extracted_at": "2025-01-01T00:00:00Z",
+    "extractor_version": "v1"
+  }
+}
