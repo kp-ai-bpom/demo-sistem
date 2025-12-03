@@ -231,12 +231,21 @@ def clean_unnecessary_qualifiers(sql: str) -> str:
     # STEP 1: Clean PostgreSQL built-in functions that shouldn't have schema prefix
     # Pattern: employee.CURRENT_DATE, employee.NOW(), etc
     # This applies to ALL queries (single-table and JOINs)
-    pg_functions = ['CURRENT_DATE', 'CURRENT_TIME', 'CURRENT_TIMESTAMP', 'NOW', 'LOCALTIME', 'LOCALTIMESTAMP']
+    pg_functions = [
+        'CURRENT_DATE', 'CURRENT_TIME', 'CURRENT_TIMESTAMP', 
+        'NOW', 'LOCALTIME', 'LOCALTIMESTAMP',
+        'AGE',  # Tambahkan AGE function
+        'DATE_TRUNC', 'DATE_PART', 'EXTRACT',  # Date functions lainnya yang sering salah
+        'COALESCE', 'NULLIF', 'GREATEST', 'LEAST',  # Common functions
+        'CONCAT', 'CONCAT_WS', 'SUBSTRING', 'LENGTH',  # String functions
+        'UPPER', 'LOWER', 'TRIM', 'LTRIM', 'RTRIM',
+        'CAST', 'TO_CHAR', 'TO_DATE', 'TO_TIMESTAMP'
+    ]
     for func in pg_functions:
-        # Remove schema prefix from functions: employee.CURRENT_DATE -> CURRENT_DATE
-        # Also handle: schema.table.CURRENT_DATE -> CURRENT_DATE
-        sql = re.sub(rf'\b\w+\.\w+\.({func})\b', rf'\1', sql, flags=re.I)  # schema.table.FUNC
-        sql = re.sub(rf'\b\w+\.({func})\b', rf'\1', sql, flags=re.I)       # schema.FUNC or table.FUNC
+        # Remove schema prefix from functions: employee.AGE(...) -> AGE(...)
+        # Handle both uppercase and lowercase
+        sql = re.sub(rf'\b\w+\.\w+\.({func})\s*\(', rf'\1(', sql, flags=re.I)  # schema.table.FUNC(
+        sql = re.sub(rf'\b\w+\.({func})\s*\(', rf'\1(', sql, flags=re.I)       # schema.FUNC( or table.FUNC(
     
     # STEP 2: For single-table queries, also clean column qualifiers
     # Skip jika ada JOIN - kualifikasi mungkin diperlukan untuk columns
@@ -325,6 +334,12 @@ ENUM_DOC = build_enum_documentation(ENUM_INDEX, ENUM_SYNONYMS)
 SYSTEM = f"""
 You convert natural language to safe, read-only PostgreSQL for the connected database.
 
+**CRITICAL SCOPE RESTRICTION:**
+- You ONLY answer questions about the database schema provided below
+- If a question is NOT related to querying the database (e.g., general knowledge, greetings, cooking, etc.), respond with ONLY this JSON:
+  {{"sql": "", "params": [], "explanation": "Maaf, saya hanya bisa menjawab pertanyaan terkait data dalam database. Silakan tanyakan tentang karyawan, departemen, atau data lain yang tersedia dalam sistem."}}
+- Valid questions MUST be about: retrieving, filtering, aggregating, or analyzing data from the tables in the schema
+
 Rules:
 - Output ONLY a JSON object with keys: sql, params, explanation.
 - Exactly one SELECT statement, no semicolons.
@@ -368,6 +383,14 @@ Examples:
 5. Aggregation query:
    Q: "How many employees per department?"
    A: {{"sql": "SELECT d.dept_name, COUNT(e.emp_id) as employee_count FROM employee.employees e JOIN employee.departments d ON e.dept_id = d.dept_id GROUP BY d.dept_id, d.dept_name", "params": [], "explanation": "Menghitung jumlah karyawan di setiap departemen"}}
+
+6. Out of scope question:
+   Q: "What is fried rice?"
+   A: {{"sql": "", "params": [], "explanation": "Maaf, saya hanya bisa menjawab pertanyaan terkait data dalam database. Silakan tanyakan tentang karyawan, departemen, atau data lain yang tersedia dalam sistem."}}
+
+7. Greeting or chitchat:
+   Q: "Hello, how are you?"
+   A: {{"sql": "", "params": [], "explanation": "Maaf, saya hanya bisa menjawab pertanyaan terkait data dalam database. Silakan tanyakan tentang karyawan, departemen, atau data lain yang tersedia dalam sistem."}}
 
 SCHEMA: {truncate_for_prompt(json.dumps(SCHEMA), SCHEMA_SNIPPET_CHARS)}
 """
@@ -541,11 +564,15 @@ with tab_chat:
         for m in st.session_state.chat_messages:
             with st.chat_message(m["role"]):
                 if m["role"] == "assistant" and isinstance(m["content"], dict):
-                    # render paket hasil (tanpa SQL dan EXPLAIN untuk chatbot)
+                    # render paket hasil
                     pkg = m["content"]
                     if "text" in pkg:
                         st.write(pkg["text"])
-                    # SQL dan EXPLAIN tidak ditampilkan di chatbot
+                    # SQL ditampilkan dalam expander/dropdown
+                    if "sql" in pkg and pkg["sql"]:
+                        with st.expander("🔍 Lihat SQL Query"):
+                            st.code(pkg["sql"], language="sql")
+                    # Data hasil
                     if "df" in pkg and isinstance(pkg["df"], pd.DataFrame):
                         if not pkg["df"].empty:
                             st.dataframe(pkg["df"], use_container_width=True, hide_index=True)
@@ -593,6 +620,15 @@ with tab_chat:
                 params_raw = args.get("params", [])
                 explanation = args.get("explanation", "")
 
+                # Check jika pertanyaan diluar scope (sql kosong tapi ada explanation)
+                if not sql_raw and explanation:
+                    st.session_state.chat_messages.append({
+                        "role": "assistant",
+                        "content": {"text": explanation}
+                    })
+                    st.session_state.is_processing = False
+                    st.rerun()
+
                 if not sql_raw:
                     raise RuntimeError("LLM tidak mengembalikan field 'sql'.")
 
@@ -635,9 +671,10 @@ with tab_chat:
                         st.session_state.is_processing = False
                         st.rerun()
 
-                    # Render hasil (tanpa SQL dan EXPLAIN)
+                   # Render hasil (dengan SQL di expander)
                     pkg = {
                         "text": explanation or "Berikut hasil query:",
+                        "sql": sql_norm,  # Simpan SQL untuk ditampilkan di expander
                     }
                     if isinstance(df, pd.DataFrame):
                         pkg["df"] = df
